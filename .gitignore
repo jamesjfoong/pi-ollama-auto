@@ -1,0 +1,14 @@
+# pi IDE artifacts
+.pi-lens/
+
+# Node
+node_modules/
+
+# Build artifacts
+dist/
+
+# Formatting cache
+.prettiercache
+
+# OS
+.DS_Store

@@ -1,0 +1,38 @@
+{
+	"name": "pi-ollama",
+	"version": "1.0.0",
+	"description": "Auto-discover and register Ollama models in pi. No more manual models.json editing.",
+	"keywords": [
+		"pi-package",
+		"ollama",
+		"models",
+		"pi-extension",
+		"local-llm"
+	],
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/jamesjfoong/pi-ollama.git"
+	},
+	"bugs": {
+		"url": "https://github.com/jamesjfoong/pi-ollama/issues"
+	},
+	"homepage": "https://github.com/jamesjfoong/pi-ollama#readme",
+	"author": "",
+	"scripts": {
+		"format": "prettier --write .",
+		"format:check": "prettier --check .",
+		"typecheck": "tsc --noEmit",
+		"test": "npx tsx --test test/*.test.ts"
+	},
+	"devDependencies": {
+		"@types/node": "^20.19.39",
+		"prettier": "^3.3.0",
+		"tsx": "^4.15.0"
+	},
+	"pi": {
+		"extensions": [
+			"./extensions"
+		]
+	}
+}
