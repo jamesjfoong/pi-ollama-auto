@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.1] - 2026-05-02
+
+### Added
+
+- Add pi.dev package gallery image metadata via `pi.image`.
+- Add `assets/pi-ollama-gallery.png` gallery preview asset.
+- Add `RELEASE.md` with validation, smoke-test, publish, and verification checklist.
+
+### Validated
+
+- Smoke-tested published npm package extension load with local Ollama; provider registration discovered 39 models.
+
 ## [1.0.0] - 2026-05-01
 
 ### Added
