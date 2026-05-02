@@ -9,8 +9,24 @@ function maskSecret(value: string): string {
 	return `${value.slice(0, visible)}***`;
 }
 
+function buildMenu(working: OllamaConfig): string {
+	const lines = [
+		"1) Base URL     : " + working.baseUrl,
+		"2) API Key      : " + maskSecret(working.apiKey),
+		"3) Auth Header  : " + (working.authHeader ? "on" : "off"),
+		"4) Filter       : " + (working.filter || "(none)"),
+		"5) Test connection",
+		"6) Save & discover",
+		"7) Cancel",
+		"",
+		"Enter choice (1-7):",
+	];
+	return lines.join("\n");
+}
+
 /**
- * Interactive step-by-step wizard for configuring Ollama auto-discovery.
+ * Interactive config menu you can navigate freely.
+ * Pick a field, edit it, then return to the menu.
  * Returns the updated config, or `null` if the user cancelled.
  */
 export async function runSetupWizard(
@@ -19,51 +35,76 @@ export async function runSetupWizard(
 ): Promise<OllamaConfig | null> {
 	const working = { ...current };
 
-	// Step 1: Base URL
-	const baseUrl = await ctx.ui.input(
-		"Ollama Base URL (hint: local http://localhost:11434 or cloud https://ollama.com/v1)",
-		working.baseUrl,
-	);
-	if (baseUrl === null) return null;
-	working.baseUrl = resolveBaseUrl(baseUrl || working.baseUrl);
+	while (true) {
+		const choice = await ctx.ui.input(buildMenu(working));
+		if (choice === null) return null;
 
-	// Step 2: API Key
-	const apiKey = await ctx.ui.input(
-		"API Key (or env var name) — leave empty to keep current",
-		maskSecret(working.apiKey),
-	);
-	if (apiKey === null) return null;
-	working.apiKey = apiKey || working.apiKey;
+		switch (choice.trim()) {
+			case "1": {
+				const baseUrl = await ctx.ui.input(
+					"Ollama Base URL (hint: local http://localhost:11434 or cloud https://ollama.com/v1)",
+					working.baseUrl,
+				);
+				if (baseUrl !== null) {
+					working.baseUrl = resolveBaseUrl(baseUrl || working.baseUrl);
+				}
+				break;
+			}
 
-	// Step 3: Auth Header
-	const authHeader = await ctx.ui.confirm(
-		"Auth Header",
-		`Send Authorization: Bearer header? Currently: ${working.authHeader ? "on" : "off"}`,
-	);
-	working.authHeader = authHeader;
+			case "2": {
+				const apiKey = await ctx.ui.input(
+					"API Key (or env var name) — leave empty to keep current",
+					maskSecret(working.apiKey),
+				);
+				if (apiKey !== null) {
+					working.apiKey = apiKey || working.apiKey;
+				}
+				break;
+			}
 
-	// Step 4: Filter regex
-	const filter = await ctx.ui.input("Model filter regex (optional)", working.filter || "");
-	if (filter === null) return null;
-	working.filter = filter || undefined;
+			case "3": {
+				const authHeader = await ctx.ui.confirm(
+					"Auth Header",
+					`Send Authorization: Bearer header? Currently: ${working.authHeader ? "on" : "off"}`,
+				);
+				working.authHeader = authHeader;
+				break;
+			}
 
-	// Step 5: Test connection
-	const test = await ctx.ui.confirm("Test connection?", `Test ${working.baseUrl} before saving?`);
-	if (test) {
-		ctx.ui.notify("[pi-ollama] Testing…", "info");
-		try {
-			const discovery = await discoverModels(working);
-			ctx.ui.notify(
-				`[pi-ollama] ✓ ${discovery.models.length} models found (${discovery.source})`,
-				"success",
-			);
-		} catch (err) {
-			const msg = err instanceof Error ? err.message : String(err);
-			ctx.ui.notify(`[pi-ollama] ✗ ${msg.slice(0, 120)}`, "warning");
-			const proceed = await ctx.ui.confirm("Save anyway?", "Test failed. Save config anyway?");
-			if (!proceed) return null;
+			case "4": {
+				const filter = await ctx.ui.input("Model filter regex (optional)", working.filter || "");
+				if (filter !== null) {
+					working.filter = filter || undefined;
+				}
+				break;
+			}
+
+			case "5": {
+				ctx.ui.notify("[pi-ollama] Testing…", "info");
+				try {
+					const discovery = await discoverModels(working);
+					ctx.ui.notify(
+						`[pi-ollama] ✓ ${discovery.models.length} models found (${discovery.source})`,
+						"success",
+					);
+				} catch (err) {
+					const msg = err instanceof Error ? err.message : String(err);
+					ctx.ui.notify(`[pi-ollama] ✗ ${msg.slice(0, 120)}`, "warning");
+				}
+				break;
+			}
+
+			case "6": {
+				return working;
+			}
+
+			case "7": {
+				return null;
+			}
+
+			default:
+				ctx.ui.notify("[pi-ollama] Invalid choice. Pick 1-7.", "warning");
+				break;
 		}
 	}
-
-	return working;
 }
