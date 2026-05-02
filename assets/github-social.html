@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>pi-ollama — GitHub Social</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@700;800&display=swap"
+			rel="stylesheet"
+		/>
+		<style>
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
+			body {
+				width: 1280px;
+				height: 640px;
+				background: #08080c;
+				font-family: "Space Mono", monospace;
+				overflow: hidden;
+				position: relative;
+			}
+			.grain {
+				position: absolute;
+				inset: 0;
+				opacity: 0.04;
+				background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+				pointer-events: none;
+				z-index: 1;
+			}
+			.grid {
+				position: absolute;
+				inset: 0;
+				background-image:
+					linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+					linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+				background-size: 40px 40px;
+				pointer-events: none;
+				z-index: 0;
+			}
+			.orb {
+				position: absolute;
+				border-radius: 50%;
+				filter: blur(80px);
+				opacity: 0.35;
+				z-index: 0;
+			}
+			.orb-1 {
+				width: 420px;
+				height: 420px;
+				background: #00d4aa;
+				top: -100px;
+				right: -60px;
+			}
+			.orb-2 {
+				width: 280px;
+				height: 280px;
+				background: #ff6b35;
+				bottom: -40px;
+				left: -30px;
+				opacity: 0.2;
+			}
+			.content {
+				position: absolute;
+				z-index: 2;
+				left: 60px;
+				right: 60px;
+				top: 40px;
+			}
+			.badge {
+				display: inline-flex;
+				align-items: center;
+				gap: 6px;
+				background: rgba(0, 212, 170, 0.1);
+				border: 1px solid rgba(0, 212, 170, 0.3);
+				padding: 5px 12px;
+				border-radius: 4px;
+				font-size: 10px;
+				color: #00d4aa;
+				text-transform: uppercase;
+				letter-spacing: 0.15em;
+				font-weight: 700;
+			}
+			.badge::before {
+				content: "";
+				width: 5px;
+				height: 5px;
+				background: #00d4aa;
+				border-radius: 50%;
+				box-shadow: 0 0 6px #00d4aa;
+			}
+			.npm-badge {
+				background: rgba(193, 33, 56, 0.1);
+				border-color: rgba(193, 33, 56, 0.3);
+				color: #c12138;
+				margin-left: 8px;
+			}
+			.title {
+				font-family: "Syne", sans-serif;
+				font-weight: 800;
+				font-size: 82px;
+				line-height: 0.95;
+				color: #fff;
+				letter-spacing: -0.03em;
+				margin-top: 10px;
+			}
+			.title span {
+				color: #00d4aa;
+				text-shadow: 0 0 30px rgba(0, 212, 170, 0.3);
+			}
+			.subtitle {
+				margin-top: 12px;
+				font-size: 17px;
+				color: rgba(255, 255, 255, 0.5);
+				line-height: 1.4;
+			}
+			.subtitle code {
+				background: rgba(255, 255, 255, 0.08);
+				padding: 2px 6px;
+				border-radius: 3px;
+				color: rgba(255, 255, 255, 0.6);
+				font-size: 14px;
+			}
+			.footer {
+				position: absolute;
+				z-index: 2;
+				left: 60px;
+				right: 60px;
+				bottom: 44px;
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+			}
+			.features {
+				display: flex;
+				gap: 10px;
+			}
+			.pill {
+				padding: 8px 14px;
+				background: rgba(255, 255, 255, 0.04);
+				border: 1px solid rgba(255, 255, 255, 0.1);
+				border-radius: 6px;
+				font-size: 12px;
+				color: rgba(255, 255, 255, 0.7);
+				letter-spacing: 0.02em;
+			}
+			.pill strong {
+				color: #fff;
+			}
+			.install {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+				background: rgba(0, 212, 170, 0.08);
+				border: 1px solid rgba(0, 212, 170, 0.2);
+				padding: 10px 16px;
+				border-radius: 6px;
+				font-size: 14px;
+				color: #00d4aa;
+			}
+			.install .prompt {
+				color: rgba(255, 255, 255, 0.3);
+			}
+			.version {
+				font-size: 12px;
+				color: rgba(255, 255, 255, 0.25);
+				letter-spacing: 0.1em;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="grain"></div>
+		<div class="grid"></div>
+		<div class="orb orb-1"></div>
+		<div class="orb orb-2"></div>
+		<div class="content">
+			<div class="badge">pi extension</div>
+			<div class="badge npm-badge">v1.0.0</div>
+			<h1 class="title">pi<span>-</span>ollama</h1>
+			<p class="subtitle">
+				Auto-discover and register Ollama models in pi. No more hand-editing
+				<code>models.json</code>.
+			</p>
+		</div>
+		<div class="footer">
+			<div class="features">
+				<div class="pill"><strong>Auto-discovery</strong></div>
+				<div class="pill"><strong>Key rotation</strong></div>
+				<div class="pill"><strong>TUI setup</strong></div>
+				<div class="pill"><strong>Model fixes</strong></div>
+			</div>
+			<div class="install"><span class="prompt">$</span> pi install npm:@jamesjfoong/pi-ollama</div>
+		</div>
+	</body>
+</html>
