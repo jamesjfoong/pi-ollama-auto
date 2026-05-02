@@ -101,6 +101,7 @@ This file is auto-created and updated by `/ollama-setup`. You can also edit it d
 | `OLLAMA_FILTER`        | _(none)_                 | Regex to whitelist models (e.g. `llama\|qwen`)        |
 | `OLLAMA_CACHE_TTL_MS`  | `900000`                 | Cache TTL in milliseconds                             |
 | `OLLAMA_CACHE_TTL_MIN` | _(none)_                 | Cache TTL in minutes (used if `*_MS` not set)         |
+| `PI_OLLAMA_DEBUG`      | `0`                      | Enable verbose extension logs (`1` or `true`)         |
 
 **Tip:** If you already have an `ollama` provider in `~/.pi/agent/models.json`, this extension reads `baseUrl`, `apiKey`, `api`, and `compat` from it as a fallback. You can remove the static `models` array from `models.json`.
 

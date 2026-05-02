@@ -1,12 +1,17 @@
-type LogLevel = "info" | "warn" | "error";
+type LogLevel = "debug" | "info" | "warn" | "error";
 
 const PREFIX = "[pi-ollama]";
+const DEBUG_ENABLED =
+	process.env.PI_OLLAMA_DEBUG === "1" || process.env.PI_OLLAMA_DEBUG?.toLowerCase() === "true";
 
 /**
- * Centralized logger so we can swap output strategies later
- * (e.g. structured logging, silence in tests, etc.).
+ * Logging policy:
+ * - warn/error: always emitted
+ * - info/debug: emitted only when PI_OLLAMA_DEBUG=1 (or true)
  */
 export function log(level: LogLevel, message: string): void {
+	if ((level === "debug" || level === "info") && !DEBUG_ENABLED) return;
+
 	const full = `${PREFIX} ${message}`;
 	if (level === "error") {
 		console.error(full);

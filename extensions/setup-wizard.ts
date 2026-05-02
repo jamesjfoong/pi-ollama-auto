@@ -2,6 +2,13 @@ import { resolveBaseUrl } from "./config";
 import { discoverModels } from "./discovery";
 import type { CommandContext, OllamaConfig } from "./types";
 
+function maskSecret(value: string): string {
+	if (!value) return "";
+	if (value.length <= 4) return "*".repeat(value.length);
+	const visible = Math.min(6, Math.max(2, Math.floor(value.length / 4)));
+	return `${value.slice(0, visible)}***`;
+}
+
 /**
  * Interactive step-by-step wizard for configuring Ollama auto-discovery.
  * Returns the updated config, or `null` if the user cancelled.
@@ -13,12 +20,18 @@ export async function runSetupWizard(
 	const working = { ...current };
 
 	// Step 1: Base URL
-	const baseUrl = await ctx.ui.input("Ollama Base URL", working.baseUrl);
+	const baseUrl = await ctx.ui.input(
+		"Ollama Base URL (hint: local http://localhost:11434 or cloud https://ollama.com/v1)",
+		working.baseUrl,
+	);
 	if (baseUrl === null) return null;
 	working.baseUrl = resolveBaseUrl(baseUrl || working.baseUrl);
 
 	// Step 2: API Key
-	const apiKey = await ctx.ui.input("API Key (or env var name)", working.apiKey);
+	const apiKey = await ctx.ui.input(
+		"API Key (or env var name) — leave empty to keep current",
+		maskSecret(working.apiKey),
+	);
 	if (apiKey === null) return null;
 	working.apiKey = apiKey || working.apiKey;
 
