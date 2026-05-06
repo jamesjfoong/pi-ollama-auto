@@ -75,6 +75,12 @@ export interface DiscoveredModel {
 	}>;
 	headers?: Record<string, string>;
 	compat?: Record<string, unknown>;
+	// --- enrichment from /api/show ---
+	badges?: string[];
+	parameterSize?: string;
+	quantizationLevel?: string;
+	family?: string;
+	contextBucket?: "short" | "standard" | "long" | "massive";
 }
 
 export interface DiscoveryResult {

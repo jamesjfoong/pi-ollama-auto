@@ -6,6 +6,7 @@ import {
 	ENRICH_TIMEOUT_MS,
 	LIST_TIMEOUT_MS,
 } from "./constants";
+import { enrichModel, quickBadges } from "./enrich";
 import type { DiscoveredModel, DiscoveryResult, EnrichmentStats, OllamaConfig } from "./types";
 
 function openAiUrl(baseUrl: string, prefix: string | undefined, path: string): string {
@@ -43,11 +44,11 @@ function buildAuthHeaders(config: OllamaConfig, keyIndex = 0): Record<string, st
 	return headers;
 }
 
-async function tryWithKeyRotation<T>(
+async function tryWithKeyRotation<TResult>(
 	config: OllamaConfig,
-	operation: (keyIndex: number) => Promise<T>,
+	operation: (keyIndex: number) => Promise<TResult>,
 	isAuthError: (err: unknown) => boolean,
-): Promise<T> {
+): Promise<TResult> {
 	const keys = config.apiKeys ?? [config.apiKey];
 	let lastErr: unknown;
 
@@ -122,57 +123,6 @@ async function discoverNativeModelIds(config: OllamaConfig): Promise<string[]> {
 	return (payload.models || []).map((m) => m.name).filter(Boolean);
 }
 
-function extractContextLength(modelInfo: Record<string, unknown>): number {
-	for (const [key, value] of Object.entries(modelInfo)) {
-		if (!key.endsWith(".context_length")) continue;
-		const num = Number(value);
-		if (Number.isFinite(num) && num > 0) return num;
-	}
-	return DEFAULT_CONTEXT_WINDOW;
-}
-
-async function enrichModel(config: OllamaConfig, modelId: string): Promise<DiscoveredModel> {
-	const url = `${config.baseUrl}/api/show`;
-	const response = await tryWithKeyRotation(
-		config,
-		async (keyIndex) => {
-			const res = await fetchWithTimeout(
-				url,
-				{
-					method: "POST",
-					headers: buildAuthHeaders(config, keyIndex),
-					body: JSON.stringify({ model: modelId, verbose: true }),
-				},
-				ENRICH_TIMEOUT_MS,
-			);
-			if (!res.ok) {
-				throw new Error(`/api/show ${res.status}: ${await res.text()}`);
-			}
-			return res;
-		},
-		isAuthFailure,
-	);
-
-	const payload = (await response.json()) as {
-		capabilities?: string[];
-		model_info?: Record<string, unknown>;
-	};
-
-	const capabilities = payload.capabilities || [];
-	const vision = capabilities.includes("vision");
-	const thinking = capabilities.includes("thinking");
-	const contextWindow = extractContextLength(payload.model_info || {});
-
-	return {
-		id: modelId,
-		name: modelId,
-		reasoning: thinking,
-		input: vision ? ["text", "image"] : ["text"],
-		contextWindow,
-		maxTokens: Math.min(DEFAULT_MAX_TOKENS, contextWindow),
-	};
-}
-
 async function normalizeAndEnrich(
 	config: OllamaConfig,
 	modelIds: string[],
@@ -203,6 +153,7 @@ async function normalizeAndEnrich(
 					input: ["text"],
 					contextWindow: DEFAULT_CONTEXT_WINDOW,
 					maxTokens: DEFAULT_MAX_TOKENS,
+					badges: quickBadges(batch[j]),
 				});
 				enrichment.failed += 1;
 			}

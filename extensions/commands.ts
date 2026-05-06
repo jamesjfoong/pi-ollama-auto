@@ -12,7 +12,7 @@ import {
 	setCurrentConfig,
 } from "./provider";
 import { runSetupWizard } from "./setup-wizard";
-import type { CommandContext, ExtensionAPI, OllamaConfig } from "./types";
+import type { CommandContext, DiscoveredModel, ExtensionAPI, OllamaConfig } from "./types";
 
 /** Return cached config or re-resolve from disk/env. */
 function getConfig(): Promise<OllamaConfig> {
@@ -40,11 +40,18 @@ function keyPoolSummary(config: OllamaConfig): string {
 	return `keyPool=${keys.length}x keys=${masked.join(", ")}`;
 }
 
-function modelTags(model: { reasoning: boolean; input: readonly string[] }): string {
-	const tags: string[] = [];
-	if (model.reasoning) tags.push("reasoning");
-	if (model.input.includes("image")) tags.push("vision");
-	return tags.join(", ") || "text-only";
+/**
+ * Build a display tag string for a model.
+ * Reconciles discovered badges with current overrides so that
+ * vision/reasoning fixes are reflected immediately.
+ */
+function modelTags(model: DiscoveredModel): string {
+	const tags = new Set(model.badges ?? []);
+	if (model.reasoning) tags.add("🧠");
+	else tags.delete("🧠");
+	if (model.input[1] === "image") tags.add("👁️");
+	else tags.delete("👁️");
+	return Array.from(tags).join(" ") || "text-only";
 }
 
 async function persistExactModelOverride(
@@ -168,10 +175,22 @@ export function registerCommands(pi: ExtensionAPI): void {
 			const filter = config.filter ? ` filter=${config.filter}` : "";
 			const refreshed = formatDuration(Date.now() - getLastRefreshAt());
 			const keys = keyPoolSummary(config);
-			ctx.ui.notify(
+
+			const lines: string[] = [];
+			lines.push(
 				`[pi-ollama] ${discovered.length} @ ${config.baseUrl} source=${source} ${keys} cacheAge=${age} refreshed=${refreshed} ago${filter}`,
-				"info",
 			);
+
+			// Compact model list when count is small enough to fit nicely
+			if (discovered.length <= 8) {
+				for (const m of discovered) {
+					const tagStr = modelTags(m);
+					const meta = [m.parameterSize, m.quantizationLevel].filter(Boolean).join(" ");
+					lines.push(`  ${m.name}  ${tagStr}${meta ? `  ${meta}` : ""}`);
+				}
+			}
+
+			ctx.ui.notify(lines.join("\n"), "info");
 		},
 	});
 
@@ -375,8 +394,13 @@ export function registerCommands(pi: ExtensionAPI): void {
 				? ` thinkingFormat=${String(model.compat.thinkingFormat)}`
 				: "";
 
+			const size = model.parameterSize || "?";
+			const quant = model.quantizationLevel || "?";
+			const family = model.family || "?";
+			const bucket = model.contextBucket || "?";
+
 			ctx.ui.notify(
-				`[pi-ollama] ${model.id} | ${modelTags(model)} | context=${model.contextWindow.toLocaleString()} maxTokens=${model.maxTokens.toLocaleString()}${thinkingFormat}${fixSummary}`,
+				`[pi-ollama] ${model.id} | ${modelTags(model)} | family=${family} | size=${size} | quant=${quant} | ctx=${model.contextWindow.toLocaleString()}(${bucket}) | maxTokens=${model.maxTokens.toLocaleString()}${thinkingFormat}${fixSummary}`,
 				"info",
 			);
 		},
