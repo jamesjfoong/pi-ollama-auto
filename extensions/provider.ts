@@ -1,9 +1,15 @@
 import { DEFAULT_CONTEXT_WINDOW, DEFAULT_MAX_TOKENS } from "./constants";
 import { shouldInclude } from "./discovery";
 import { applyModelOverrides } from "./overrides";
-import type { DiscoveredModel, DiscoveryResult, ExtensionAPI, OllamaConfig } from "./types";
+import type {
+	DiscoveredModel,
+	DiscoveryResult,
+	ExtensionAPI,
+	OllamaConfig,
+	OllamaExtensionSettings,
+} from "./types";
 
-/** Mutable runtime state — kept in this module to avoid global pollution. */
+/** Mutable runtime state - kept in this module to avoid global pollution. */
 const state = {
 	config: null as OllamaConfig | null,
 	models: [] as DiscoveredModel[],
@@ -75,6 +81,16 @@ export function registerProvider(
 			},
 			headers: m.headers,
 			compat: m.compat,
+			// Extra Ollama /api/chat `options` sampling params, from env vars
+			// (see settings.ts). Omitted entirely when unset, so Ollama's own
+			// Modelfile/server default applies.
+			topP: m.topP,
+			topK: m.topK,
+			repeatPenalty: m.repeatPenalty,
+			minP: m.minP,
+			presencePenalty: m.presencePenalty,
+			frequencyPenalty: m.frequencyPenalty,
+			seed: m.seed,
 		})),
 	});
 }
