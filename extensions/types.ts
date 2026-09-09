@@ -13,6 +13,19 @@ export interface OllamaConfig {
 	globalModelDefaults?: ModelOverride;
 	modelOverridePatterns?: ModelOverridePattern[];
 	modelOverrides?: Record<string, ModelOverride>;
+	/**
+	 * Extra Ollama `/api/chat` `options` sampling params, from `OLLAMA_*` env vars.
+	 * Act as a global fallback — a model's own value (from `globalModelDefaults`,
+	 * `modelOverridePatterns`, or `modelOverrides`) always wins. Unset (default) or
+	 * unparseable = field omitted, Ollama's own Modelfile/server default applies.
+	 */
+	topP?: number;
+	topK?: number;
+	repeatPenalty?: number;
+	minP?: number;
+	presencePenalty?: number;
+	frequencyPenalty?: number;
+	seed?: number;
 }
 
 /** Shape of the JSON file persisted to disk. */
@@ -49,6 +62,14 @@ export interface ModelOverride {
 	cost?: Partial<ModelCost>;
 	headers?: Record<string, string>;
 	compat?: Record<string, unknown>;
+	/** Extra Ollama `/api/chat` `options` sampling params. See `OllamaConfig` for env-var fallback. */
+	topP?: number;
+	topK?: number;
+	repeatPenalty?: number;
+	minP?: number;
+	presencePenalty?: number;
+	frequencyPenalty?: number;
+	seed?: number;
 }
 
 export interface ModelOverridePattern {
@@ -85,44 +106,12 @@ export interface DiscoveredModel {
 	seed?: number;
 }
 
-/** Extension settings resolved from environment variables and persisted config. */
-export interface OllamaExtensionSettings {
-	/** Base URL of the Ollama server, e.g. http://localhost:11434 */
-	baseUrl: string;
-	/**
-	 * keep_alive for /api/chat requests. Resolution order:
-	 *   1. Persisted config from `/ollama-keep-alive` slash command
-	 *   2. `OLLAMA_KEEP_ALIVE` env var
-	 *   3. undefined - the field is omitted; the Ollama server's own setting
-	 *      decides (the default, since a per-request value overrides the server).
-	 *
-	 * Mutable at runtime - the slash command writes here AND to the persisted
-	 * config file so changes survive restart.
-	 */
-	keepAlive?: string | number;
-	/** Default num_ctx if model's contextWindow is unavailable. Default: 32768 */
-	numCtx: number;
-	/** Max ghost-token retries before surfacing an error. Default: 2 */
-	ghostRetries: number;
-	/** User-set context length override. Resolution order:
-	 *   1. Persisted config from `/ollama-context` slash command
-	 *   2. `OLLAMA_CONTEXT_LENGTH` env var
-	 *   3. undefined (fall through to min(model.contextWindow, numCtx) in provider)
-	 *
-	 * Mutable at runtime - the slash command writes here AND to the persisted
-	 * config file so changes survive restart.
-	 */
-	contextLength?: number;
-	/** Per-model num_ctx overrides, from the persisted config file. Takes priority over contextLength. */
-	perModelContext?: Record<string, number>;
-	/** Extra Ollama /api/chat `options` sampling params, from env vars (see below). */
-	topP?: number;
-	topK?: number;
-	repeatPenalty?: number;
-	minP?: number;
-	presencePenalty?: number;
-	frequencyPenalty?: number;
-	seed?: number;
+export interface DiscoveryResult {
+	source: "live-openai" | "live-native" | "cache-fresh" | "cache-stale";
+	models: DiscoveredModel[];
+	enrichment: EnrichmentStats;
+	cacheAgeMs?: number;
+	warnings?: string[];
 }
 
 /** Context passed to command handlers by the pi runtime. */

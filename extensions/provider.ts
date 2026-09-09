@@ -1,15 +1,9 @@
 import { DEFAULT_CONTEXT_WINDOW, DEFAULT_MAX_TOKENS } from "./constants";
 import { shouldInclude } from "./discovery";
 import { applyModelOverrides } from "./overrides";
-import type {
-	DiscoveredModel,
-	DiscoveryResult,
-	ExtensionAPI,
-	OllamaConfig,
-	OllamaExtensionSettings,
-} from "./types";
+import type { DiscoveredModel, DiscoveryResult, ExtensionAPI, OllamaConfig } from "./types";
 
-/** Mutable runtime state - kept in this module to avoid global pollution. */
+/** Mutable runtime state — kept in this module to avoid global pollution. */
 const state = {
 	config: null as OllamaConfig | null,
 	models: [] as DiscoveredModel[],
@@ -81,16 +75,18 @@ export function registerProvider(
 			},
 			headers: m.headers,
 			compat: m.compat,
-			// Extra Ollama /api/chat `options` sampling params, from env vars
-			// (see settings.ts). Omitted entirely when unset, so Ollama's own
-			// Modelfile/server default applies.
-			topP: m.topP,
-			topK: m.topK,
-			repeatPenalty: m.repeatPenalty,
-			minP: m.minP,
-			presencePenalty: m.presencePenalty,
-			frequencyPenalty: m.frequencyPenalty,
-			seed: m.seed,
+			// Extra Ollama /api/chat `options` sampling params. A model-specific
+			// value (from globalModelDefaults/modelOverridePatterns/modelOverrides,
+			// already applied above) wins; otherwise fall back to the OLLAMA_* env
+			// var on `config` (see config.ts). Omitted entirely when neither is set,
+			// so Ollama's own Modelfile/server default applies.
+			topP: m.topP ?? config.topP,
+			topK: m.topK ?? config.topK,
+			repeatPenalty: m.repeatPenalty ?? config.repeatPenalty,
+			minP: m.minP ?? config.minP,
+			presencePenalty: m.presencePenalty ?? config.presencePenalty,
+			frequencyPenalty: m.frequencyPenalty ?? config.frequencyPenalty,
+			seed: m.seed ?? config.seed,
 		})),
 	});
 }

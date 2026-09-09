@@ -124,4 +124,39 @@ describe("overrides", () => {
 		assert.strictEqual(result.models[0].reasoning, false);
 		assert.ok(result.warnings[0].includes("invalid regex"));
 	});
+
+	it("applies sampling param overrides", () => {
+		const result = mergeModelOverride(model(), {
+			topP: 0.9,
+			topK: 40,
+			repeatPenalty: 1.1,
+			minP: 0.05,
+			presencePenalty: -0.5,
+			frequencyPenalty: 0.5,
+			seed: 42,
+		});
+
+		assert.strictEqual(result.topP, 0.9);
+		assert.strictEqual(result.topK, 40);
+		assert.strictEqual(result.repeatPenalty, 1.1);
+		assert.strictEqual(result.minP, 0.05);
+		assert.strictEqual(result.presencePenalty, -0.5);
+		assert.strictEqual(result.frequencyPenalty, 0.5);
+		assert.strictEqual(result.seed, 42);
+	});
+
+	it("ignores non-numeric sampling param overrides and warns", () => {
+		const warnings: string[] = [];
+		const result = mergeModelOverride(
+			model(),
+			{ topP: "high" as any, seed: "abc" as any },
+			"bad",
+			warnings,
+		);
+
+		assert.strictEqual(result.topP, undefined);
+		assert.strictEqual(result.seed, undefined);
+		assert.ok(warnings.some((w) => w.includes("topP")));
+		assert.ok(warnings.some((w) => w.includes("seed")));
+	});
 });

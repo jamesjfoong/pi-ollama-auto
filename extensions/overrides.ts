@@ -23,6 +23,10 @@ function isPositiveNumber(value: unknown): value is number {
 	return typeof value === "number" && Number.isFinite(value) && value > 0;
 }
 
+function isFiniteNumber(value: unknown): value is number {
+	return typeof value === "number" && Number.isFinite(value);
+}
+
 function filterNumberMap(
 	value: unknown,
 	keys: string[],
@@ -107,6 +111,34 @@ function sanitizeOverride(
 	if ("compat" in raw) {
 		if (isPlainObject(raw.compat)) out.compat = raw.compat;
 		else warnings.push(`Ignoring ${path}.compat: expected object`);
+	}
+	if ("topP" in raw) {
+		if (isFiniteNumber(raw.topP)) out.topP = raw.topP;
+		else warnings.push(`Ignoring ${path}.topP: expected number`);
+	}
+	if ("topK" in raw) {
+		if (isFiniteNumber(raw.topK)) out.topK = raw.topK;
+		else warnings.push(`Ignoring ${path}.topK: expected number`);
+	}
+	if ("repeatPenalty" in raw) {
+		if (isFiniteNumber(raw.repeatPenalty)) out.repeatPenalty = raw.repeatPenalty;
+		else warnings.push(`Ignoring ${path}.repeatPenalty: expected number`);
+	}
+	if ("minP" in raw) {
+		if (isFiniteNumber(raw.minP)) out.minP = raw.minP;
+		else warnings.push(`Ignoring ${path}.minP: expected number`);
+	}
+	if ("presencePenalty" in raw) {
+		if (isFiniteNumber(raw.presencePenalty)) out.presencePenalty = raw.presencePenalty;
+		else warnings.push(`Ignoring ${path}.presencePenalty: expected number`);
+	}
+	if ("frequencyPenalty" in raw) {
+		if (isFiniteNumber(raw.frequencyPenalty)) out.frequencyPenalty = raw.frequencyPenalty;
+		else warnings.push(`Ignoring ${path}.frequencyPenalty: expected number`);
+	}
+	if ("seed" in raw) {
+		if (isFiniteNumber(raw.seed)) out.seed = raw.seed;
+		else warnings.push(`Ignoring ${path}.seed: expected number`);
 	}
 	if ("thinkingLevelMap" in raw) {
 		if (isPlainObject(raw.thinkingLevelMap)) {

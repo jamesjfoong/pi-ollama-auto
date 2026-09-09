@@ -133,23 +133,23 @@ Merge order is: Ollama discovery → `globalModelDefaults` → `modelOverridePat
 
 ### Environment variables
 
-| Variable               | Default                  | Description                                         |
-| ---------------------- | ------------------------ | --------------------------------------------------- |
-| `OLLAMA_BASE_URL`      | `http://localhost:11434` | Ollama API endpoint (`/v1` suffix is auto-stripped) |
-| `OLLAMA_API_KEY`       | `ollama`                 | API key or env-var name                             |
-| `OLLAMA_API_KEYS`      | _(none)_                 | Comma-separated key pool for rotation               |
-| `OLLAMA_API`           | `openai-completions`     | API type used by pi                                 |
-| `OLLAMA_FILTER`        | _(none)_                 | Regex to whitelist models (e.g. `llama\|qwen`)      |
-| `OLLAMA_CACHE_TTL_MS`  | `900000`                 | Cache TTL in milliseconds                           |
-| `OLLAMA_CACHE_TTL_MIN` | _(none)_                 | Cache TTL in minutes (used if `*_MS` not set)       |
-| `PI_OLLAMA_DEBUG`      | `0`                      | Enable verbose extension logs (`1` or `true`)       |
-| `OLLAMA_TOP_P`         | _(none)_                 | Top-p (nucleus) sampling probability threshold       |
-| `OLLAMA_TOP_K`         | _(none)_                 | Top-k sampling                                      |
-| `OLLAMA_REPEAT_PENALTY`| _(none)_                 | Repetition penalty                                  |
-| `OLLAMA_MIN_P`         | _(none)_                 | Minimum probability threshold                       |
-| `OLLAMA_PRESENCE_PENALTY`| _(none)_               | Presence penalty                                    |
-| `OLLAMA_FREQUENCY_PENALTY`| _(none)_              | Frequency penalty                                   |
-| `OLLAMA_SEED`          | _(none)_                 | Random seed for reproducibility                     |
+| Variable                   | Default                  | Description                                         |
+| -------------------------- | ------------------------ | --------------------------------------------------- |
+| `OLLAMA_BASE_URL`          | `http://localhost:11434` | Ollama API endpoint (`/v1` suffix is auto-stripped) |
+| `OLLAMA_API_KEY`           | `ollama`                 | API key or env-var name                             |
+| `OLLAMA_API_KEYS`          | _(none)_                 | Comma-separated key pool for rotation               |
+| `OLLAMA_API`               | `openai-completions`     | API type used by pi                                 |
+| `OLLAMA_FILTER`            | _(none)_                 | Regex to whitelist models (e.g. `llama\|qwen`)      |
+| `OLLAMA_CACHE_TTL_MS`      | `900000`                 | Cache TTL in milliseconds                           |
+| `OLLAMA_CACHE_TTL_MIN`     | _(none)_                 | Cache TTL in minutes (used if `*_MS` not set)       |
+| `PI_OLLAMA_DEBUG`          | `0`                      | Enable verbose extension logs (`1` or `true`)       |
+| `OLLAMA_TOP_P`             | _(none)_                 | Top-p (nucleus) sampling probability threshold      |
+| `OLLAMA_TOP_K`             | _(none)_                 | Top-k sampling                                      |
+| `OLLAMA_REPEAT_PENALTY`    | _(none)_                 | Repetition penalty                                  |
+| `OLLAMA_MIN_P`             | _(none)_                 | Minimum probability threshold                       |
+| `OLLAMA_PRESENCE_PENALTY`  | _(none)_                 | Presence penalty                                    |
+| `OLLAMA_FREQUENCY_PENALTY` | _(none)_                 | Frequency penalty                                   |
+| `OLLAMA_SEED`              | _(none)_                 | Random seed for reproducibility                     |
 
 **Tip:** If you already have an `ollama` provider in `~/.pi/agent/models.json`, this extension reads `baseUrl`, `apiKey`, `api`, and `compat` from it as a fallback. You can remove the static `models` array from `models.json`.
 

@@ -150,6 +150,51 @@ describe("provider", () => {
 				xhigh: "max",
 			});
 		});
+
+		it("falls back to config-level sampling params when the model has none", () => {
+			const mock = makeMockPi();
+			const config = makeConfig({
+				topP: 0.9,
+				topK: 40,
+				repeatPenalty: 1.1,
+				minP: 0.05,
+				presencePenalty: -0.5,
+				frequencyPenalty: 0.5,
+				seed: 42,
+			});
+
+			registerProvider(mock, config, makeResult());
+
+			const registered = mock.calls[0].config.models[0];
+			assert.strictEqual(registered.topP, 0.9);
+			assert.strictEqual(registered.topK, 40);
+			assert.strictEqual(registered.repeatPenalty, 1.1);
+			assert.strictEqual(registered.minP, 0.05);
+			assert.strictEqual(registered.presencePenalty, -0.5);
+			assert.strictEqual(registered.frequencyPenalty, 0.5);
+			assert.strictEqual(registered.seed, 42);
+		});
+
+		it("prefers a per-model sampling param override over the config-level fallback", () => {
+			const mock = makeMockPi();
+			const config = makeConfig({
+				topP: 0.9,
+				modelOverrides: { "llama3:8b": { topP: 0.5 } },
+			});
+
+			registerProvider(mock, config, makeResult());
+
+			assert.strictEqual(mock.calls[0].config.models[0].topP, 0.5);
+		});
+
+		it("omits sampling params entirely when neither model nor config sets them", () => {
+			const mock = makeMockPi();
+			registerProvider(mock, makeConfig(), makeResult());
+
+			const registered = mock.calls[0].config.models[0];
+			assert.strictEqual(registered.topP, undefined);
+			assert.strictEqual(registered.seed, undefined);
+		});
 	});
 
 	describe("getLastDiscovered / getLastResult", () => {

@@ -1,9 +1,10 @@
 import assert from "node:assert";
-import { describe, it } from "node:test";
+import { afterEach, describe, it } from "node:test";
 import { DEFAULTS, DEFAULT_PREFIX } from "../extensions/constants";
 import {
 	resolveApiKeys,
 	resolveBaseUrl,
+	resolveEnvNumber,
 	resolvePrefix,
 	resolveSingleKey,
 	stripTrailingSlash,
@@ -117,6 +118,38 @@ describe("config", () => {
 			assert.deepStrictEqual(resolveApiKeys("KEY_A,KEY_B"), ["resolved-a", "resolved-b"]);
 			delete process.env.KEY_A;
 			delete process.env.KEY_B;
+		});
+	});
+
+	describe("resolveEnvNumber", () => {
+		const NAME = "OLLAMA_TEST_NUMBER";
+
+		afterEach(() => {
+			delete process.env[NAME];
+		});
+
+		it("returns undefined when unset", () => {
+			assert.strictEqual(resolveEnvNumber(NAME), undefined);
+		});
+
+		it("parses a valid number", () => {
+			process.env[NAME] = "0.9";
+			assert.strictEqual(resolveEnvNumber(NAME), 0.9);
+		});
+
+		it("parses negative numbers", () => {
+			process.env[NAME] = "-0.5";
+			assert.strictEqual(resolveEnvNumber(NAME), -0.5);
+		});
+
+		it("returns undefined for unparseable values", () => {
+			process.env[NAME] = "not-a-number";
+			assert.strictEqual(resolveEnvNumber(NAME), undefined);
+		});
+
+		it("returns undefined for empty string", () => {
+			process.env[NAME] = "";
+			assert.strictEqual(resolveEnvNumber(NAME), undefined);
 		});
 	});
 });

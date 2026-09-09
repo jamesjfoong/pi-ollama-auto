@@ -23,6 +23,13 @@ export const DEFAULTS: Required<
 		| "globalModelDefaults"
 		| "modelOverridePatterns"
 		| "modelOverrides"
+		| "topP"
+		| "topK"
+		| "repeatPenalty"
+		| "minP"
+		| "presencePenalty"
+		| "frequencyPenalty"
+		| "seed"
 	>
 > = {
 	baseUrl: "http://localhost:11434",

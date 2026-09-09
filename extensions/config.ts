@@ -70,6 +70,14 @@ export function resolvePrefix(input?: string): string {
 	return input || DEFAULT_PREFIX;
 }
 
+/** Parse an env var as a finite number, or undefined if unset/unparseable. */
+export function resolveEnvNumber(name: string): number | undefined {
+	const raw = process.env[name];
+	if (!raw) return undefined;
+	const n = Number(raw);
+	return Number.isFinite(n) ? n : undefined;
+}
+
 /**
  * Resolve a single API key value.
  * - If prefixed with `!`, treat the remainder as a literal key.
@@ -136,5 +144,12 @@ export async function resolveConfig(): Promise<OllamaConfig> {
 		globalModelDefaults: persisted.globalModelDefaults,
 		modelOverridePatterns: persisted.modelOverridePatterns,
 		modelOverrides: persisted.modelOverrides,
+		topP: resolveEnvNumber("OLLAMA_TOP_P"),
+		topK: resolveEnvNumber("OLLAMA_TOP_K"),
+		repeatPenalty: resolveEnvNumber("OLLAMA_REPEAT_PENALTY"),
+		minP: resolveEnvNumber("OLLAMA_MIN_P"),
+		presencePenalty: resolveEnvNumber("OLLAMA_PRESENCE_PENALTY"),
+		frequencyPenalty: resolveEnvNumber("OLLAMA_FREQUENCY_PENALTY"),
+		seed: resolveEnvNumber("OLLAMA_SEED"),
 	};
 }
