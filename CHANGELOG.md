@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.2] - 2026-09-10
+
+### Fixed
+
+- Normalize legacy `baseUrl` values ending in `/v1` to prevent duplicated API paths.
+- Keep native `/api/tags` and `/api/show` requests on Ollama root URL.
+
+### Validated
+
+- Tested with local Ollama 0.32.0 through `pi` and `omp`.
+- Existing configurations using `http://localhost:11434/v1` continue to work.
+
 ## [1.0.1] - 2026-05-02
 
 ### Added

@@ -1,6 +1,6 @@
 {
 	"name": "@jamesjfoong/pi-ollama",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"description": "Auto-discover and register Ollama models in pi. No more manual models.json editing.",
 	"keywords": [
 		"pi-package",
