@@ -1,4 +1,5 @@
 import { DEFAULT_CONTEXT_WINDOW, DEFAULT_MAX_TOKENS } from "./constants";
+import { normalizeBaseUrl } from "./config";
 import { shouldInclude } from "./discovery";
 import { applyModelOverrides } from "./overrides";
 import type { DiscoveredModel, DiscoveryResult, ExtensionAPI, OllamaConfig } from "./types";
@@ -49,7 +50,7 @@ export function registerProvider(
 	};
 	state.lastRefreshAt = Date.now();
 
-	const effectiveBaseUrl = config.prefix ? `${config.baseUrl}${config.prefix}` : config.baseUrl;
+	const effectiveBaseUrl = `${normalizeBaseUrl(config.baseUrl, config.prefix || "")}${config.prefix || ""}`;
 	pi.registerProvider("ollama", {
 		baseUrl: effectiveBaseUrl,
 		api: config.api,

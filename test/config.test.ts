@@ -2,6 +2,7 @@ import assert from "node:assert";
 import { describe, it } from "node:test";
 import { DEFAULTS, DEFAULT_PREFIX } from "../extensions/constants";
 import {
+	normalizeBaseUrl,
 	resolveApiKeys,
 	resolveBaseUrl,
 	resolvePrefix,
@@ -43,6 +44,22 @@ describe("config", () => {
 
 		it("preserves /v1 in nested paths", () => {
 			assert.strictEqual(resolveBaseUrl("http://host/api/v1"), "http://host/api/v1");
+		});
+	});
+
+	describe("normalizeBaseUrl", () => {
+		it("removes legacy API prefix from persisted base URL", () => {
+			assert.strictEqual(
+				normalizeBaseUrl("http://localhost:11434/v1", "/v1"),
+				"http://localhost:11434",
+			);
+		});
+
+		it("preserves root URL when prefix is absent", () => {
+			assert.strictEqual(
+				normalizeBaseUrl("http://localhost:11434", "/v1"),
+				"http://localhost:11434",
+			);
 		});
 	});
 

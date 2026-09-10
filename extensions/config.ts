@@ -65,6 +65,10 @@ export function resolveBaseUrl(input?: string): string {
 	return stripTrailingSlash(input || DEFAULTS.baseUrl);
 }
 
+export function normalizeBaseUrl(baseUrl: string, prefix: string): string {
+	return prefix && baseUrl.endsWith(prefix) ? baseUrl.slice(0, -prefix.length) : baseUrl;
+}
+
 export function resolvePrefix(input?: string): string {
 	if (input === "") return "";
 	return input || DEFAULT_PREFIX;
@@ -109,9 +113,11 @@ export async function resolveConfig(): Promise<OllamaConfig> {
 	const persisted = await loadPersistedConfig();
 	const fallback = await loadModelsJsonFallback();
 
-	const baseUrl = resolveBaseUrl(
+	const configuredBaseUrl = resolveBaseUrl(
 		process.env.OLLAMA_BASE_URL ?? persisted.baseUrl ?? fallback.baseUrl,
 	);
+	const prefix = resolvePrefix(process.env.OLLAMA_PREFIX ?? persisted.prefix ?? fallback.prefix);
+	const baseUrl = normalizeBaseUrl(configuredBaseUrl, prefix);
 
 	// Prefer apiKeys array, fall back to legacy apiKey
 	const keysInput =
@@ -132,7 +138,7 @@ export async function resolveConfig(): Promise<OllamaConfig> {
 		compat: persisted.compat ?? fallback.compat ?? DEFAULTS.compat,
 		authHeader: persisted.authHeader ?? fallback.authHeader ?? DEFAULTS.authHeader,
 		filter: process.env.OLLAMA_FILTER ?? persisted.filter,
-		prefix: resolvePrefix(process.env.OLLAMA_PREFIX ?? persisted.prefix ?? fallback.prefix),
+		prefix,
 		globalModelDefaults: persisted.globalModelDefaults,
 		modelOverridePatterns: persisted.modelOverridePatterns,
 		modelOverrides: persisted.modelOverrides,

@@ -101,6 +101,18 @@ describe("provider", () => {
 			assert.strictEqual(mock.calls[0].config.apiKey, "key1");
 		});
 
+		it("does not duplicate API prefix for legacy base URL", () => {
+			const mock = makeMockPi();
+
+			registerProvider(
+				mock,
+				makeConfig({ baseUrl: "http://localhost:11434/v1", prefix: "/v1" }),
+				makeResult(),
+			);
+
+			assert.strictEqual(mock.calls[0].config.baseUrl, "http://localhost:11434/v1");
+		});
+
 		it("applies defaults for zero contextWindow/maxTokens", () => {
 			const mock = makeMockPi();
 			const config = makeConfig();
