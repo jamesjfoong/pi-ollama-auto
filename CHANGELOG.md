@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.3] - 2026-09-10
+
+### Added
+
+- Add PiOllama logo to README.
+- Document `omp` installation and one-shot usage.
+- Add npm, CI, and GitHub release badges.
+
+### Validated
+
+- Tested published package through `omp` with local Ollama.
+
 ## [1.0.2] - 2026-09-10
 
 ### Fixed
