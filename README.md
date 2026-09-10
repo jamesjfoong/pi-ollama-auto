@@ -1,8 +1,16 @@
 # pi-ollama
 
-Auto-discover and register Ollama models in [pi](https://pi.dev). No more hand-editing `models.json`.
+<p align="center">
+  <img src="./assets/logo.jpeg" alt="PiOllama Plugins logo" width="240" />
+</p>
 
-Whenever you `ollama pull` a new model, it shows up in `/model` automatically — no restart, no JSON editing.
+[![npm](https://img.shields.io/npm/v/@jamesjfoong/pi-ollama?style=flat-square)](https://www.npmjs.com/package/@jamesjfoong/pi-ollama)
+[![CI](https://github.com/jamesjfoong/pi-ollama/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/jamesjfoong/pi-ollama/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/jamesjfoong/pi-ollama?style=flat-square)](https://github.com/jamesjfoong/pi-ollama/releases)
+
+Auto-discover and register Ollama models in [pi](https://pi.dev) and `omp`. No manual `models.json` editing.
+
+Whenever you `ollama pull` a new model, it shows up in `/model` automatically. No restart, no JSON editing.
 
 <a href="https://github.com/sponsors/jamesjfoong" target="_blank"><img src="https://img.shields.io/badge/Sponsor-%E2%9D%A4-pink?style=flat-square&logo=github&logoColor=white" alt="GitHub Sponsors" /></a>
 
@@ -17,6 +25,22 @@ Or test drive without installing:
 ```bash
 pi -e npm:@jamesjfoong/pi-ollama
 ```
+
+### Use with `omp`
+
+`omp` passes its arguments to `pi`, so the same package works with a local Ollama instance:
+
+```bash
+omp -e npm:@jamesjfoong/pi-ollama
+```
+
+For a one-shot prompt:
+
+```bash
+omp -p -e npm:@jamesjfoong/pi-ollama --model ollama/<model-name> "<prompt>"
+```
+
+Replace `<model-name>` with a model shown by `/model` or `ollama list`.
 
 ## What it does
 
