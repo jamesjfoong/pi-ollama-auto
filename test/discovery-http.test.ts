@@ -73,6 +73,25 @@ describe("discovery (HTTP)", () => {
 		assert.ok((result.models[0].input as string[]).includes("image"));
 	});
 
+	it("uses root URL for native endpoints with legacy /v1 base URL", async () => {
+		const urls: string[] = [];
+		mockFetchWith({
+			"/v1/models": (url) => {
+				urls.push(url);
+				return json({ data: [{ id: "llama3:8b", object: "model" }] });
+			},
+			"/api/show": (url) => {
+				urls.push(url);
+				return json({ capabilities: [], model_info: {} });
+			},
+		});
+
+		const result = await discoverModels(makeConfig({ baseUrl: `${BASE}/v1`, prefix: "/v1" }));
+
+		assert.strictEqual(result.source, "live-openai");
+		assert.deepStrictEqual(urls, [`${BASE}/v1/models`, `${BASE}/api/show`]);
+	});
+
 	it("falls back to native /api/tags when OpenAI returns empty list", async () => {
 		mockFetchWith({
 			"/v1/models": () => json({ data: [] }),

@@ -1,4 +1,5 @@
 import { getCacheAgeMs, isCacheFresh, loadCache, saveCache } from "./cache";
+import { normalizeBaseUrl } from "./config";
 import {
 	CONCURRENCY,
 	DEFAULT_CONTEXT_WINDOW,
@@ -100,7 +101,8 @@ async function discoverOpenAiModelIds(config: OllamaConfig): Promise<string[]> {
 }
 
 async function discoverNativeModelIds(config: OllamaConfig): Promise<string[]> {
-	const url = `${config.baseUrl}/api/tags`;
+	const root = normalizeBaseUrl(config.baseUrl, config.prefix || "");
+	const url = `${root}/api/tags`;
 	const response = await tryWithKeyRotation(
 		config,
 		async (keyIndex) => {
@@ -132,7 +134,8 @@ function extractContextLength(modelInfo: Record<string, unknown>): number {
 }
 
 async function enrichModel(config: OllamaConfig, modelId: string): Promise<DiscoveredModel> {
-	const url = `${config.baseUrl}/api/show`;
+	const root = normalizeBaseUrl(config.baseUrl, config.prefix || "");
+	const url = `${root}/api/show`;
 	const response = await tryWithKeyRotation(
 		config,
 		async (keyIndex) => {
